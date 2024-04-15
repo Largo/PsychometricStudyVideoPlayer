@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Player</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <input type="file" id="videoFile" accept="video/*">
+    <video id="videoPlayer" controls width="640" height="480">
+        Your browser does not support the video tag.
+    </video>
+    <div id="speedControls">
+        <button class="speedButton" data-speed="1">1x</button>
+        <button class="speedButton" data-speed="0.85">0.85x</button>
+        <button class="speedButton" data-speed="0.7">0.7x</button>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>
