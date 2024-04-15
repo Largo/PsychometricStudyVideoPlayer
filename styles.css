@@ -65,18 +65,8 @@ section {
   #seekSlider::-webkit-slider-thumb {
     -webkit-appearance: none; /* Override default appearance */
     appearance: none;
-    width: 35px; /* Large thumb for easy grip */
-    height: 35px; /* Same as width */
-    background: #4CAF50; /* Green color */
-    cursor: pointer; /* Indicate it's draggable */
-  }
-
-  #seekSlider::-moz-range-thumb {
-    width: 35px; /* Large thumb for easy grip */
-    height: 35px; /* Same as width */
-    background: #4CAF50; /* Green color */
-    cursor: pointer; /* Indicate it's draggable */
-    border-radius: 100px;
+    width: 90px; /* Large thumb for easy grip */
+    height: 90px; /* Same as width */
   }
 
   #seekSlider {
@@ -85,6 +75,18 @@ section {
   #seekSlider::-moz-range-thumb {
     width: 90px; /* Large thumb for easy grip */
     height: 90px; /* Same as width */
+    border-radius: 100px;
+    background: #4CAF50; /* Green color */
+    cursor: pointer; /* Indicate it's draggable */
+  }
+
+  #seekSlider::-webkit-slider-thumb {
+    width: 90px; /* Large thumb for easy grip */
+    height: 90px; /* Same as width */
+    border-radius: 100px;
+    background: #4CAF50; /* Green color */
+    cursor: pointer; /* Indicate it's draggable */
+
   }
 
   button {
