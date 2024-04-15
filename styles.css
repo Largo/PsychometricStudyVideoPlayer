@@ -1,15 +1,27 @@
-body {
-    display: flex;
+section {
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
 }
 
+#videoFile {
+    display: inline-block;
+}
+
+#currentTime {
+    font-size:40px;
+}
+
 #videoPlayer {
-    margin-top: 20px;
+    display: block;
+    margin-top: 0;
+    width: auto;
+    height: 300px;
+    background: black;
 }
 
 #speedControls {
@@ -40,5 +52,50 @@ body {
   }
 }
 .buttons {
-    display: none;
+    display: flex;
 }
+
+#seekSlider {
+    height: 25px; /* Larger height for easier grip */
+    -webkit-appearance: none; /* Override default appearance */
+    width: 100%; /* Full-width slider */
+    margin: 10px 0; /* Some space above and below */
+  }
+
+  #seekSlider::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Override default appearance */
+    appearance: none;
+    width: 35px; /* Large thumb for easy grip */
+    height: 35px; /* Same as width */
+    background: #4CAF50; /* Green color */
+    cursor: pointer; /* Indicate it's draggable */
+  }
+
+  #seekSlider::-moz-range-thumb {
+    width: 35px; /* Large thumb for easy grip */
+    height: 35px; /* Same as width */
+    background: #4CAF50; /* Green color */
+    cursor: pointer; /* Indicate it's draggable */
+    border-radius: 100px;
+  }
+
+  #seekSlider {
+    height: 100px;
+  }
+  #seekSlider::-moz-range-thumb {
+    width: 90px; /* Large thumb for easy grip */
+    height: 90px; /* Same as width */
+  }
+
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 5px;
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #e2e6ea;
+  }
