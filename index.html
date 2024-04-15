@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Player</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="browser.script.iife.js"></script>
 </head>
 <body>
+    <div id="spinner"></div>
     <input type="file" id="videoFile" accept="video/*">
     <video id="videoPlayer" controls width="640" height="480">
         Your browser does not support the video tag.
@@ -16,6 +18,7 @@
         <button class="speedButton" data-speed="0.85">0.85x</button>
         <button class="speedButton" data-speed="0.7">0.7x</button>
     </div>
+    <script type="text/ruby" src="require/main.rb" data-eval="async"></script>
     <script src="scripts.js"></script>
 </body>
 </html>

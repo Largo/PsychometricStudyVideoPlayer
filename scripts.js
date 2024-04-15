@@ -6,3 +6,12 @@ document.getElementById('videoFile').addEventListener('change', function(event) 
         videoPlayer.src = url;
     }
 });
+
+const speedButtons = document.querySelectorAll('.speedButton');
+speedButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        const speed = this.getAttribute('data-speed');
+        const videoPlayer = document.getElementById('videoPlayer');
+        videoPlayer.playbackRate = parseFloat(speed);
+    });
+});
