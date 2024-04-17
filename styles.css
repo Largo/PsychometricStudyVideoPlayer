@@ -1,3 +1,14 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+body {
+  background: #f0f0f0;
+  margin: 0;
+}
+
 section {
     display: none;
     flex-direction: column;
@@ -8,20 +19,33 @@ section {
     background-color: #f0f0f0;
 }
 
+
+
 #videoFile {
     display: inline-block;
+}
+
+.timing-labels {
+  text-align: center;
 }
 
 #currentTime {
     font-size:40px;
 }
 
+
+
 #videoPlayer {
     display: block;
     margin-top: 0;
-    width: auto;
-    height: 300px;
+    width: 100%;
+    height: 40vh;
     background: black;
+    flex-grow: 1;
+}
+
+.controls {
+    flex-grow: 1;
 }
 
 #speedControls {
@@ -56,7 +80,7 @@ section {
 }
 
 #seekSlider {
-    height: 25px; /* Larger height for easier grip */
+    height: 45px; /* Larger height for easier grip */
     -webkit-appearance: none; /* Override default appearance */
     width: 100%; /* Full-width slider */
     margin: 10px 0; /* Some space above and below */
@@ -70,19 +94,19 @@ section {
   }
 
   #seekSlider {
-    height: 100px;
+    height: 50px;
   }
   #seekSlider::-moz-range-thumb {
-    width: 90px; /* Large thumb for easy grip */
-    height: 90px; /* Same as width */
+    width: 60px; /* Large thumb for easy grip */
+    height: 60px; /* Same as width */
     border-radius: 100px;
     background: #4CAF50; /* Green color */
     cursor: pointer; /* Indicate it's draggable */
   }
 
   #seekSlider::-webkit-slider-thumb {
-    width: 90px; /* Large thumb for easy grip */
-    height: 90px; /* Same as width */
+    width: 60px; /* Large thumb for easy grip */
+    height: 60px; /* Same as width */
     border-radius: 100px;
     background: #4CAF50; /* Green color */
     cursor: pointer; /* Indicate it's draggable */
@@ -100,4 +124,11 @@ section {
   }
   button:hover {
     background-color: #e2e6ea;
+  }
+
+  #timeInput { /* Assuming 'timeInput' is your search box id */
+    height: 60px; /* Double the default height or set as needed */
+    font-size: 20px; /* Increase font size for better readability */
+    padding: 10px 20px; /* Adjust padding to match the height */
+    width: 100%;
   }

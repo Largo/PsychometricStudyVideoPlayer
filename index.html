@@ -13,30 +13,31 @@
         <video id="videoPlayer" controls width="640" height="480">
             Your browser does not support the video tag.
         </video>
-        <div>
-            <span id="currentTime">00:00</span> /
-            <span id="duration">00:00</span>
-          </div>
-        <input type="range" id="seekSlider" value="0" style="width: 100%;" />
-        <input type="file" id="videoFile" accept="video/*">
-    
-        <div class="buttons">
-            <button class="pauseButton">Play</button>
-    
-            <div id="speedControls">
-                <button class="speedButton" data-speed="1">1x</button>
-                <button class="speedButton" data-speed="0.85">0.85x</button>
-                <button class="speedButton" data-speed="0.7">0.7x</button>
+        <div class="controls">
+            <div class="timing-labels">
+                <span id="currentTime">00:00</span> /
+                <span id="duration">00:00</span>
             </div>
-            <div>
-                <button id="back10">Back 10s</button>
-                <button id="forward10">Forward 10s</button>
-                <button id="back30">Back 30s</button>
-                <button id="forward30">Forward 30s</button>
+            <input type="range" id="seekSlider" value="0" style="width: 100%;" />
+            <input type="file" id="videoFile" accept="video/*">
+        
+            <div class="buttons">
+                <button class="pauseButton">Play</button>
+        
+                <div id="speedControls">
+                    <button class="speedButton" data-speed="1">1x</button>
+                    <button class="speedButton" data-speed="0.85">0.85x</button>
+                    <button class="speedButton" data-speed="0.7">0.7x</button>
+                </div>
+                <div>
+                    <button id="back10">Back 10s</button>
+                    <button id="forward10">Forward 10s</button>
+                    <button id="back30">Back 30s</button>
+                    <button id="forward30">Forward 30s</button>
+                </div>
             </div>
+            <input type="text" id="timeInput" placeholder="Jump to time (e.g., 1:30, 90s, 1m 30s)" />
         </div>
-        <input type="text" id="timeInput" placeholder="Jump to time (e.g., 1:30, 90s, 1m 30s)" style="width: 100%;"/>
-    
     </section>
         <script type="text/ruby" src="require/main.rb" data-eval="async"></script>
 </body>

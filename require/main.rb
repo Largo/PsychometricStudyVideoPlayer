@@ -10,14 +10,15 @@ end
 app_path = __FILE__
 $0 = File::basename(app_path, ".rb") if app_path
 #require_relative "require/second" # Here it should be relative to main.rb. Note: I will upstream the fix for this.
+@document = JS.global.document
 
-JS.global.document.getElementById("spinner").style.display = "none"
-JS.global.document.querySelector("section").style.display = "flex"
+@document.getElementById("spinner").style.display = "none"
+@document.querySelector("section").style.display = "flex"
 
-#JS.global.document.querySelector(".buttons").style.display = "block"
-@video_player = JS.global.document.getElementById('videoPlayer')
-@current_time_display = JS.global.document.getElementById('currentTime')
-@duration_display = JS.global.document.getElementById('duration')
+#@document.querySelector(".buttons").style.display = "block"
+@video_player = @document.getElementById('videoPlayer')
+@current_time_display = @document.getElementById('currentTime')
+@duration_display = @document.getElementById('duration')
 
 def format_time(seconds)
   mins = (seconds / 60).floor
@@ -26,21 +27,24 @@ def format_time(seconds)
 end
 
  # Handle video file selection and setting the video source
- video_file_element = JS.global.document.getElementById('videoFile')
+ video_file_element = @document.getElementById('videoFile')
 
  video_file_element.addEventListener('change') do |event|
    file = event.target.files[0]
    if file and not file.undefined? 
      url = JS.global.URL.createObjectURL(file)
-     video_player = JS.global.document.getElementById('videoPlayer')
+     video_player = @document.getElementById('videoPlayer')
      video_player.src = url
    end
  end
 
  video_file_element.dispatchEvent(JS.global.Event.new('change'))
 
- document = JS.global.document
- @pauseButton = document.querySelector(".pauseButton")
+
+ @pauseButton = @document.querySelector(".pauseButton")
+ def isPlaying?
+  not (@video_player.paused? || @video_player.ended?)
+ end 
 
  @pauseButton.addEventListener("click") do 
   if @video_player.paused?
@@ -56,17 +60,21 @@ end
  end
 
  # Handle playback rate adjustments from speed buttons
- speed_buttons = JS.global.document.querySelectorAll('.speedButton')
+ speed_buttons = @document.querySelectorAll('.speedButton')
  speed_buttons.to_a.each do |button|
    button.addEventListener('click') do
+    speed_buttons.to_a.each { |btn| btn.style.backgroundColor = "" }
+    # Highlight the clicked button
+    button.style.backgroundColor = "#4CAF50"
+
      speed = button.getAttribute('data-speed')
      @video_player.playbackRate = speed.to_f
      @video_player.play
    end
  end
 
- @video_player = JS.global.document.getElementById('videoPlayer')
- @seek_slider = JS.global.document.getElementById('seekSlider')
+ @video_player = @document.getElementById('videoPlayer')
+ @seek_slider = @document.getElementById('seekSlider')
  @seek_slider.value = 0
  # Update the slider max value based on the video duration
  @video_player.addEventListener('loadedmetadata') do
@@ -81,20 +89,20 @@ end
  end
 
  @video_player.addEventListener('play') do
-  document.querySelector(".pauseButton").innerText = "Pause"
+  @document.querySelector(".pauseButton").innerText = "Pause"
  end
  @video_player.addEventListener('pause') do
-  document.querySelector(".pauseButton").innerText = "Play"
+  @document.querySelector(".pauseButton").innerText = "Play"
  end
 
  # Update slider position as the video plays
  @video_player.addEventListener('timeupdate') do
-   @seek_slider.value = @video_player.currentTime unless @seek_slider === JS.global.document.activeElement
+   @seek_slider.value = @video_player.currentTime unless @seek_slider === @document.activeElement
    @current_time_display.innerText = format_time(@video_player.currentTime)
  end
 
-  @seek_slider = JS.global.document.getElementById('seekSlider')
-  @time_input = JS.global.document.getElementById('timeInput')
+  @seek_slider = @document.getElementById('seekSlider')
+  @time_input = @document.getElementById('timeInput')
   @time_input.value = ""
   @time_input.addEventListener('change') do
     input_time = parse_time(@time_input.value)
@@ -132,10 +140,10 @@ end
     seconds
   end
 
-  @back10 = JS.global.document.getElementById('back10')
-  @forward10 = JS.global.document.getElementById('forward10')
-  @back30 = JS.global.document.getElementById('back30')
-  @forward30 = JS.global.document.getElementById('forward30')
+  @back10 = @document.getElementById('back10')
+  @forward10 = @document.getElementById('forward10')
+  @back30 = @document.getElementById('back30')
+  @forward30 = @document.getElementById('forward30')
 
   # Event listeners for the jump buttons
   @back10.addEventListener('click') do
