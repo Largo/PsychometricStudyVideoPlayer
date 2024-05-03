@@ -40,7 +40,6 @@ end
 
  video_file_element.dispatchEvent(JS.global.Event.new('change'))
 
-
  @pauseButton = @document.querySelector(".pauseButton")
  def isPlaying?
   not (@video_player.paused? || @video_player.ended?)
@@ -110,6 +109,12 @@ end
       @video_player.currentTime = input_time
       puts input_time
       #@seek_slider.value = input_time
+    end
+  end
+
+  @time_input.addEventListener('keypress') do |e|
+    if e.key === 'Enter'
+      @time_input.dispatchEvent(JS.global.Event.new('change'))
     end
   end
 
