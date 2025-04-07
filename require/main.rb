@@ -19,12 +19,15 @@ $0 = File.basename(app_path, ".rb") if app_path
 @points = 0
 @points_list = []
 @markers_list = []
-@locked = false
+@locked = true
 @eta = 0
 @lower_slider_value = 0
 @upper_slider_value = 10
 @has_unsaved_changes = false
 @prev_second = 0
+@default_config = {
+  "autoReturnRatingsToZero" => true  # Default setting to auto-return ratings to zero
+}
 
 @video_player = @document.getElementById("videoPlayer")
 @current_time_display = @document.getElementById("currentTime")
@@ -115,11 +118,14 @@ end
     @has_unsaved_changes = true
 
     # Auto return ratings to zero if enabled (similar to Python app)
-    if @locked == false && (Time.now.to_f - @eta) >= 2
+    if @default_config["autoReturnRatingsToZero"] && @locked == false && (Time.now.to_f - @eta) >= 2
+      JS.global.console.log("Auto-returning to zero")
       if @points > 0
         @points -= 1
+        update_points_display
       elsif @points < 0
         @points += 1
+        update_points_display
       end
     end
 
@@ -175,7 +181,7 @@ end
 def increase_points
   if @points < @upper_slider_value
     @points += 1
-    @locked = true
+    @locked = false
     @eta = Time.now.to_f
     update_points_display
   end
@@ -184,7 +190,7 @@ end
 def decrease_points
   if @points > @lower_slider_value
     @points -= 1
-    @locked = true
+    @locked = truefalse
     @eta = Time.now.to_f
     update_points_display
   end
@@ -196,6 +202,7 @@ def add_marker
 end
 
 def update_points_display
+  JS.global.console.log("Updating points display: #{@points}")
   @points_display.innerText = @points.to_s
 end
 
@@ -271,12 +278,36 @@ def create_points_ui
   save_button.style.marginLeft = "10px"
   save_button.addEventListener("click") { save_data }
 
+  # Create toggle for auto-return to zero
+  auto_return_container = @document.createElement("div")
+  auto_return_container.style.display = "flex"
+  auto_return_container.style.alignItems = "center"
+  auto_return_container.style.marginLeft = "10px"
+
+  auto_return_checkbox = @document.createElement("input")
+  auto_return_checkbox.type = "checkbox"
+  auto_return_checkbox.id = "autoReturnCheckbox"
+  auto_return_checkbox.checked = @default_config["autoReturnRatingsToZero"]
+  auto_return_checkbox.addEventListener("change") do |e|
+    @default_config["autoReturnRatingsToZero"] = e.target.checked
+  end
+
+  auto_return_label = @document.createElement("label")
+  auto_return_label.htmlFor = "autoReturnCheckbox"
+  auto_return_label.innerText = "Auto-return to zero"
+  auto_return_label.style.marginLeft = "5px"
+  auto_return_label.style.fontSize = "12px"
+
+  auto_return_container.appendChild(auto_return_checkbox)
+  auto_return_container.appendChild(auto_return_label)
+
   # Add elements to container
   points_container.appendChild(dec_button)
   points_container.appendChild(@points_display)
   points_container.appendChild(inc_button)
   points_container.appendChild(marker_button)
   points_container.appendChild(save_button)
+  points_container.appendChild(auto_return_container)
 
   # Add container to the document
   controls_section = @document.querySelector(".controls")
@@ -293,6 +324,14 @@ def create_points_ui
       add_marker
     when "s"
       save_data if e.ctrlKey || e.metaKey
+    end
+  end
+
+  # Add button to release lock (similar to Python app)
+  @document.addEventListener("keyup") do |e|
+    case e.key
+    when "ArrowUp", "ArrowDown"
+      @locked = false
     end
   end
 end
