@@ -10,6 +10,7 @@ This video player works in the browser but also as a standalone app. It was made
 
 ```
 git clone https://github.com/Largo/PsychometricStudyVideoPlayer
+gem install webrick
 ./serve.sh
 ```
 

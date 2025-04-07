@@ -1,5 +1,6 @@
 require "js"
 require "js/require_remote"
+require "json"
 
 module Kernel
   alias_method :original_require_relative, :require_relative
@@ -13,6 +14,17 @@ $0 = File.basename(app_path, ".rb") if app_path
 
 @document.getElementById("spinner").style.display = "none"
 @document.querySelector("section").style.display = "flex"
+
+# Initialize points tracking variables
+@points = 0
+@points_list = []
+@markers_list = []
+@locked = false
+@eta = 0
+@lower_slider_value = 0
+@upper_slider_value = 10
+@has_unsaved_changes = false
+@prev_second = 0
 
 @video_player = @document.getElementById("videoPlayer")
 @current_time_display = @document.getElementById("currentTime")
@@ -95,6 +107,25 @@ end
 @video_player.addEventListener("timeupdate") do
   @seek_slider.value = @video_player.currentTime unless @seek_slider === @document.activeElement
   @current_time_display.innerText = format_time(@video_player.currentTime)
+
+  # Record points at each second
+  current_second = @video_player.currentTime.floor
+  if current_second != @prev_second && !@video_player.paused?
+    @points_list.push([(@video_player.currentTime * 1000).to_i, @points])
+    @has_unsaved_changes = true
+
+    # Auto return ratings to zero if enabled (similar to Python app)
+    if @locked == false && (Time.now.to_f - @eta) >= 2
+      if @points > 0
+        @points -= 1
+      elsif @points < 0
+        @points += 1
+      end
+    end
+
+    @prev_second = current_second
+    update_points_display
+  end
 end
 
 @seek_slider = @document.getElementById("seekSlider")
@@ -140,6 +171,132 @@ def parse_time(time_str)
   seconds
 end
 
+# Points functionality
+def increase_points
+  if @points < @upper_slider_value
+    @points += 1
+    @locked = true
+    @eta = Time.now.to_f
+    update_points_display
+  end
+end
+
+def decrease_points
+  if @points > @lower_slider_value
+    @points -= 1
+    @locked = true
+    @eta = Time.now.to_f
+    update_points_display
+  end
+end
+
+def add_marker
+  @markers_list.push([(@video_player.currentTime * 1000).to_i, 1])
+  @has_unsaved_changes = true
+end
+
+def update_points_display
+  @points_display.innerText = @points.to_s
+end
+
+def save_data
+  # Create a timestamp for the filename
+  timestamp = Time.now.strftime("%Y%m%d_%H%M%S")
+  filename = "psychometric_data_#{timestamp}.json"
+
+  # Prepare data to save
+  data = {
+    points: @points_list,
+    markers: @markers_list,
+    timestamp: timestamp
+  }
+
+  # Create a download link with the JSON data
+  json_str = JSON.generate(data)
+  blob = JS.global.Blob.new([json_str], {type: "application/json"})
+  url = JS.global.URL.createObjectURL(blob)
+
+  # Create and trigger download
+  download_link = @document.createElement("a")
+  download_link.href = url
+  download_link.download = filename
+  @document.body.appendChild(download_link)
+  download_link.click()
+  @document.body.removeChild(download_link)
+
+  @has_unsaved_changes = false
+end
+
+# Create UI elements for points functionality
+def create_points_ui
+  # Create container for points controls
+  points_container = @document.createElement("div")
+  points_container.className = "points-container"
+  points_container.style.display = "flex"
+  points_container.style.alignItems = "center"
+  points_container.style.margin = "10px 0"
+
+  # Create decrease button
+  dec_button = @document.createElement("button")
+  dec_button.innerText = "-"
+  dec_button.className = "control-button"
+  dec_button.addEventListener("click") { decrease_points }
+
+  # Create points display
+  @points_display = @document.createElement("div")
+  @points_display.innerText = @points.to_s
+  @points_display.style.margin = "0 10px"
+  @points_display.style.fontWeight = "bold"
+  @points_display.style.fontSize = "18px"
+  @points_display.style.width = "30px"
+  @points_display.style.textAlign = "center"
+
+  # Create increase button
+  inc_button = @document.createElement("button")
+  inc_button.innerText = "+"
+  inc_button.className = "control-button"
+  inc_button.addEventListener("click") { increase_points }
+
+  # Create marker button
+  marker_button = @document.createElement("button")
+  marker_button.innerText = "Mark"
+  marker_button.className = "control-button"
+  marker_button.style.marginLeft = "10px"
+  marker_button.addEventListener("click") { add_marker }
+
+  # Create save button
+  save_button = @document.createElement("button")
+  save_button.innerText = "Save"
+  save_button.className = "control-button"
+  save_button.style.marginLeft = "10px"
+  save_button.addEventListener("click") { save_data }
+
+  # Add elements to container
+  points_container.appendChild(dec_button)
+  points_container.appendChild(@points_display)
+  points_container.appendChild(inc_button)
+  points_container.appendChild(marker_button)
+  points_container.appendChild(save_button)
+
+  # Add container to the document
+  controls_section = @document.querySelector(".controls")
+  controls_section.appendChild(points_container)
+
+  # Add keyboard shortcuts
+  @document.addEventListener("keydown") do |e|
+    case e.key
+    when "ArrowUp"
+      increase_points
+    when "ArrowDown"
+      decrease_points
+    when "m"
+      add_marker
+    when "s"
+      save_data if e.ctrlKey || e.metaKey
+    end
+  end
+end
+
 @back10 = @document.getElementById("back10")
 @forward10 = @document.getElementById("forward10")
 @back30 = @document.getElementById("back30")
@@ -171,3 +328,7 @@ end
   @video_player.currentTime = new_time
   @seek_slider.value = new_time
 end
+
+# The DOM is likely already loaded at this point
+create_points_ui
+update_points_display
