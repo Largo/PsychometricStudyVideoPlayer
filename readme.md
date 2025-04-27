@@ -1,4 +1,4 @@
-# Video Player using Ruby.wasm and Electron
+# Video Player with Electron
 
 This video player works in the browser but also as a standalone app. It was made for a very specific task in academia.
 
@@ -22,14 +22,4 @@ open localhost:8080 in your browser
 npm install -g yarn
 yarn install 
 yarn run
-```
-
-## build ruby.wasm
-Not necessary, because ruby-app.wasm comes included.
-
-```
-git clone https://github.com/Largo/PsychometricStudyVideoPlayer
-cd PsychometricStudyVideoPlayer
-git clone https://github.com/largo/ruby.wasm
-./build.sh
 ```
