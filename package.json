@@ -9,5 +9,8 @@
   "private": true,
   "scripts": {
     "start": "electron ."
+  },
+  "dependencies": {
+    "@bytecodealliance/jco": "^1.10.2"
   }
 }

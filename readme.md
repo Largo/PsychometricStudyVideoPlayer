@@ -30,6 +30,9 @@ Not necessary, because ruby-app.wasm comes included.
 ```
 git clone https://github.com/Largo/PsychometricStudyVideoPlayer
 cd PsychometricStudyVideoPlayer
-git clone https://github.com/largo/ruby.wasm
+git clone --recurse-submodules https://github.com/largo/ruby.wasm
+rustup default stable
+npm install @bytecodealliance/jco
+cargo install --locked wasm-tools
 ./build.sh
 ```
