@@ -1,11 +1,5 @@
 // JavaScript equivalent of the Ruby code
 
-// Initialize document elements
-const document = window.document;
-
-document.getElementById("spinner").style.display = "none";
-document.querySelector("section").style.display = "flex";
-
 // Initialize points tracking variables
 let points = 0;
 let points_list = [];
@@ -20,9 +14,9 @@ let default_config = {
   autoReturnRatingsToZero: true  // Default setting to auto-return ratings to zero
 };
 
-let video_player = document.getElementById("videoPlayer");
-let current_time_display = document.getElementById("currentTime");
-let duration_display = document.getElementById("duration");
+let video_player;
+let current_time_display;
+let duration_display;
 let points_display;
 let seek_slider;
 let pause_button;
@@ -39,122 +33,9 @@ function format_time(seconds) {
   return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
-// Handle video file selection and setting the video source
-const video_file_element = document.getElementById("videoFile");
-
-video_file_element.addEventListener("change", (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    const url = URL.createObjectURL(file);
-    video_player = document.getElementById("videoPlayer");
-    video_player.src = url;
-  }
-});
-
-// Trigger change event to handle any pre-selected file
-video_file_element.dispatchEvent(new Event("change"));
-
-pause_button = document.querySelector(".pauseButton");
-
 function isPlaying() {
   return !(video_player.paused || video_player.ended);
 }
-
-pause_button.addEventListener("click", () => {
-  if (video_player.paused) {
-    video_player.play();
-  } else if (video_player.ended) {
-    video_player.currentTime = 0;
-    video_player.play();
-  } else {
-    video_player.pause();
-  }
-});
-
-// Handle playback rate adjustments from speed buttons
-const speed_buttons = document.querySelectorAll(".speedButton");
-Array.from(speed_buttons).forEach(button => {
-  button.addEventListener("click", () => {
-    Array.from(speed_buttons).forEach(btn => btn.style.backgroundColor = "");
-    // Highlight the clicked button
-    button.style.backgroundColor = "#4CAF50";
-
-    const speed = button.getAttribute("data-speed");
-    video_player.playbackRate = parseFloat(speed);
-    video_player.play();
-  });
-});
-
-video_player = document.getElementById("videoPlayer");
-seek_slider = document.getElementById("seekSlider");
-seek_slider.value = 0;
-
-// Update the slider max value based on the video duration
-video_player.addEventListener("loadedmetadata", () => {
-  seek_slider.max = video_player.duration;
-  duration_display.innerText = format_time(video_player.duration);
-});
-
-// Update video position when slider value changes
-seek_slider.addEventListener("input", () => {
-  video_player.currentTime = parseFloat(seek_slider.value);
-  current_time_display.innerText = format_time(video_player.currentTime);
-});
-
-video_player.addEventListener("play", () => {
-  pause_button.innerText = "Pause";
-});
-
-video_player.addEventListener("pause", () => {
-  pause_button.innerText = "Play";
-});
-
-// Update slider position as the video plays
-video_player.addEventListener("timeupdate", () => {
-  if (seek_slider !== document.activeElement) {
-    seek_slider.value = video_player.currentTime;
-  }
-  current_time_display.innerText = format_time(video_player.currentTime);
-
-  // Record points at each second
-  const current_second = Math.floor(video_player.currentTime);
-  if (current_second !== prev_second && !video_player.paused) {
-    points_list.push([Math.floor(video_player.currentTime * 1000), points]);
-    has_unsaved_changes = true;
-
-    // Auto return ratings to zero if enabled
-    if (default_config.autoReturnRatingsToZero && locked === false && (Date.now() / 1000 - eta) >= 2) {
-      console.log("Auto-returning to zero");
-      if (points > 0) {
-        points -= 1;
-        update_points_display();
-      } else if (points < 0) {
-        points += 1;
-        update_points_display();
-      }
-    }
-
-    prev_second = current_second;
-    update_points_display();
-  }
-});
-
-seek_slider = document.getElementById("seekSlider");
-time_input = document.getElementById("timeInput");
-time_input.value = "";
-
-time_input.addEventListener("change", () => {
-  const input_time = parse_time(time_input.value);
-  if (input_time) {
-    video_player.currentTime = input_time;
-  }
-});
-
-time_input.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") {
-    time_input.dispatchEvent(new Event("change"));
-  }
-});
 
 function parse_time(time_str) {
   let seconds = 0;
@@ -206,7 +87,7 @@ function increase_points() {
 function decrease_points() {
   if (points > lower_slider_value) {
     points -= 1;
-    locked = false; // Fixed a bug in the original code where it was set to "truefalse"
+    locked = false;
     eta = Date.now() / 1000;
     update_points_display();
   }
@@ -356,46 +237,198 @@ function create_points_ui() {
   });
 }
 
-back10 = document.getElementById("back10");
-forward10 = document.getElementById("forward10");
-back30 = document.getElementById("back30");
-forward30 = document.getElementById("forward30");
+// Initialize the application
+function initApp() {
+  // Initialize document elements
+  document.getElementById("spinner").style.display = "none";
+  document.querySelector("section").style.display = "flex";
+  
+  video_player = document.getElementById("videoPlayer");
+  current_time_display = document.getElementById("currentTime");
+  duration_display = document.getElementById("duration");
+  
+  // Handle video file selection and setting the video source
+  const video_file_element = document.getElementById("videoFile");
+  
+  if (video_file_element) {
+    video_file_element.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        video_player.src = url;
+      }
+    });
+    
+    // Trigger change event to handle any pre-selected file
+    video_file_element.dispatchEvent(new Event("change"));
+  } else {
+    console.error("Video file element not found");
+  }
+  
+  pause_button = document.querySelector(".pauseButton");
+  
+  if (pause_button) {
+    pause_button.addEventListener("click", () => {
+      if (video_player.paused) {
+        video_player.play();
+      } else if (video_player.ended) {
+        video_player.currentTime = 0;
+        video_player.play();
+      } else {
+        video_player.pause();
+      }
+    });
+  }
+  
+  // Handle playback rate adjustments from speed buttons
+  const speed_buttons = document.querySelectorAll(".speedButton");
+  Array.from(speed_buttons).forEach(button => {
+    button.addEventListener("click", () => {
+      Array.from(speed_buttons).forEach(btn => btn.style.backgroundColor = "");
+      // Highlight the clicked button
+      button.style.backgroundColor = "#4CAF50";
 
-// Event listeners for the jump buttons
-back10.addEventListener("click", () => {
-  const new_time = Math.max(video_player.currentTime - 10, 0);
-  video_player.currentTime = new_time;
-  seek_slider.value = new_time;
-});
-
-forward10.addEventListener("click", () => {
-  const max_time = video_player.duration;
-  const new_time = Math.min(video_player.currentTime + 10, max_time);
-  video_player.currentTime = new_time;
-  seek_slider.value = new_time;
-});
-
-back30.addEventListener("click", () => {
-  const new_time = Math.max(video_player.currentTime - 30, 0);
-  video_player.currentTime = new_time;
-  seek_slider.value = new_time;
-});
-
-forward30.addEventListener("click", () => {
-  const max_time = video_player.duration;
-  const new_time = Math.min(video_player.currentTime + 30, max_time);
-  video_player.currentTime = new_time;
-  seek_slider.value = new_time;
-});
+      const speed = button.getAttribute("data-speed");
+      video_player.playbackRate = parseFloat(speed);
+      video_player.play();
+    });
+  });
+  
+  seek_slider = document.getElementById("seekSlider");
+  if (seek_slider) {
+    seek_slider.value = 0;
+    
+    // Update video position when slider value changes
+    seek_slider.addEventListener("input", () => {
+      video_player.currentTime = parseFloat(seek_slider.value);
+      current_time_display.innerText = format_time(video_player.currentTime);
+    });
+  }
+  
+  // Update the slider max value based on the video duration
+  if (video_player) {
+    video_player.addEventListener("loadedmetadata", () => {
+      if (seek_slider) {
+        seek_slider.max = video_player.duration;
+      }
+      if (duration_display) {
+        duration_display.innerText = format_time(video_player.duration);
+      }
+    });
+    
+    video_player.addEventListener("play", () => {
+      if (pause_button) {
+        pause_button.innerText = "Pause";
+      }
+    });
+    
+    video_player.addEventListener("pause", () => {
+      if (pause_button) {
+        pause_button.innerText = "Play";
+      }
+    });
+    
+    // Update slider position as the video plays
+    video_player.addEventListener("timeupdate", () => {
+      if (seek_slider && seek_slider !== document.activeElement) {
+        seek_slider.value = video_player.currentTime;
+      }
+      if (current_time_display) {
+        current_time_display.innerText = format_time(video_player.currentTime);
+      }
+  
+      // Record points at each second
+      const current_second = Math.floor(video_player.currentTime);
+      if (current_second !== prev_second && !video_player.paused) {
+        points_list.push([Math.floor(video_player.currentTime * 1000), points]);
+        has_unsaved_changes = true;
+  
+        // Auto return ratings to zero if enabled
+        if (default_config.autoReturnRatingsToZero && locked === false && (Date.now() / 1000 - eta) >= 2) {
+          console.log("Auto-returning to zero");
+          if (points > 0) {
+            points -= 1;
+            update_points_display();
+          } else if (points < 0) {
+            points += 1;
+            update_points_display();
+          }
+        }
+  
+        prev_second = current_second;
+        update_points_display();
+      }
+    });
+  }
+  
+  time_input = document.getElementById("timeInput");
+  if (time_input) {
+    time_input.value = "";
+    
+    time_input.addEventListener("change", () => {
+      const input_time = parse_time(time_input.value);
+      if (input_time) {
+        video_player.currentTime = input_time;
+      }
+    });
+    
+    time_input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        time_input.dispatchEvent(new Event("change"));
+      }
+    });
+  }
+  
+  back10 = document.getElementById("back10");
+  forward10 = document.getElementById("forward10");
+  back30 = document.getElementById("back30");
+  forward30 = document.getElementById("forward30");
+  
+  // Event listeners for the jump buttons
+  if (back10) {
+    back10.addEventListener("click", () => {
+      const new_time = Math.max(video_player.currentTime - 10, 0);
+      video_player.currentTime = new_time;
+      if (seek_slider) seek_slider.value = new_time;
+    });
+  }
+  
+  if (forward10) {
+    forward10.addEventListener("click", () => {
+      const max_time = video_player.duration;
+      const new_time = Math.min(video_player.currentTime + 10, max_time);
+      video_player.currentTime = new_time;
+      if (seek_slider) seek_slider.value = new_time;
+    });
+  }
+  
+  if (back30) {
+    back30.addEventListener("click", () => {
+      const new_time = Math.max(video_player.currentTime - 30, 0);
+      video_player.currentTime = new_time;
+      if (seek_slider) seek_slider.value = new_time;
+    });
+  }
+  
+  if (forward30) {
+    forward30.addEventListener("click", () => {
+      const max_time = video_player.duration;
+      const new_time = Math.min(video_player.currentTime + 30, max_time);
+      video_player.currentTime = new_time;
+      if (seek_slider) seek_slider.value = new_time;
+    });
+  }
+  
+  create_points_ui();
+  update_points_display();
+}
 
 // Initialize the UI when the DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
-  create_points_ui();
-  update_points_display();
+  initApp();
 });
 
 // If the DOM is already loaded, initialize immediately
 if (document.readyState === "complete" || document.readyState === "interactive") {
-  create_points_ui();
-  update_points_display();
+  initApp();
 }
